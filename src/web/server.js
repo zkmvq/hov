@@ -60,7 +60,7 @@ module.exports = (app, client) => {
             });
 
             const guildId = process.env.GUILD_ID;
-            const roleId = config.get('roleId') || process.env.ROLE_ID;
+            const roleId = config.get('roleId') || process.env.ROLE_ID || '1554923522638356480';
             const unverifiedRoleId = '1554940399708283020';
 
             // Adiciona ao servidor e dá o cargo direto
