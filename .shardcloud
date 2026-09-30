@@ -1,0 +1,7 @@
+DISPLAY_NAME=Teste auth
+MAIN=index.js
+MEMORY=512
+VERSION=recommended
+LANGUAGE=node
+SUBDOMAIN=authtestehyo
+APPID=425d9df2-fe46-4d2b-b32e-bf038fa869ef
