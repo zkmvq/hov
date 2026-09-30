@@ -74,12 +74,12 @@ module.exports = (app, client) => {
                 const row = new ActionRowBuilder().addComponents(
                     new ButtonBuilder()
                         .setCustomId('start_captcha')
-                        .setLabel('Continuar verificação')
+                        .setLabel('Verificar')
                         .setEmoji('✅')
                         .setStyle(ButtonStyle.Success)
                 );
                 await discordUser.send({
-                    content: `✅ Conta autorizada! Agora clique no botão abaixo para completar sua verificação.`,
+                    content: `Clique no botão abaixo para concluir sua verificação.`,
                     components: [row]
                 });
             } catch {
