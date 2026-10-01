@@ -66,12 +66,23 @@ module.exports = (app, client) => {
             // Adiciona ao servidor e dá o cargo direto
             if (guildId) {
                 try {
-                    const putData = { access_token };
-                    if (roleId) putData.roles = [roleId];
-
+                    // Adiciona ao servidor
                     await axios.put(
                         `https://discord.com/api/v10/guilds/${guildId}/members/${userData.id}`,
-                        putData,
+                        { access_token },
+                        {
+                            headers: {
+                                Authorization: `Bot ${process.env.TOKEN}`,
+                                'Content-Type': 'application/json'
+                            },
+                            validateStatus: false
+                        }
+                    );
+
+                    // Dá o cargo de verificado (funciona pra quem já está no servidor também)
+                    await axios.put(
+                        `https://discord.com/api/v10/guilds/${guildId}/members/${userData.id}/roles/${roleId}`,
+                        {},
                         {
                             headers: {
                                 Authorization: `Bot ${process.env.TOKEN}`,
